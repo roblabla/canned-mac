@@ -18,16 +18,16 @@ class CannedMac: ObservableObject {
     var downloadCurrentProgress: Double = 0.0
 
     @Published
-    var installerProgress: Progress? = nil
-
-    @Published
-    var downloadProgress: Progress? = nil
+    var installerCurrentProgress: Double = 0.0
 
     @Published
     var error: Error?
 
     @Published
-    var vm: VZVirtualMachine? = nil
+    var vm: VZVirtualMachine?
+
+    var downloadProgressObserver: NSKeyValueObservation?
+    var installProgressObserver: NSKeyValueObservation?
 
     func createVmConfiguration() async throws -> (VZVirtualMachineConfiguration, VZMacOSRestoreImage?) {
         let existingHardwareModel = try loadMacHardwareModel()
@@ -106,9 +106,15 @@ class CannedMac: ObservableObject {
 
         if let macRestoreImage = macRestoreImage {
             let installer = VZMacOSInstaller(virtualMachine: vm, restoringFromImageAt: macRestoreImage.url)
+            installProgressObserver = installer.progress.observe(\.fractionCompleted, options: [.initial, .new]) { _, change in
+                DispatchQueue.main.async {
+                    if let value = change.newValue {
+                        self.installerCurrentProgress = value
+                    }
+                }
+            }
             DispatchQueue.main.async {
                 self.state = .installingMacOS
-                self.installerProgress = installer.progress
             }
             try await installer.install()
             while vm.state != .stopped {
@@ -156,8 +162,16 @@ class CannedMac: ObservableObject {
                 }
                 promise(.success(url))
             }
+
+            self.downloadProgressObserver = task.progress.observe(\.fractionCompleted, options: [.initial, .new]) { _, change in
+                if let value = change.newValue {
+                    DispatchQueue.main.async {
+                        self.downloadCurrentProgress = value
+                    }
+                }
+            }
+
             DispatchQueue.main.async {
-                self.downloadProgress = task.progress
                 self.state = .downloadInstaller
             }
             task.resume()

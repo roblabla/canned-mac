@@ -13,8 +13,13 @@ struct DownloadInstallerView: View {
 
     var body: some View {
         VStack {
-            Text("Downloading macOS Installer")
-            ProgressView(can.downloadProgress ?? Progress())
+            Text("Downloading macOS Installer: \(DownloadInstallerView.formatCurrentProgress(can.downloadCurrentProgress))%")
+
+            ProgressView(value: can.downloadCurrentProgress)
         }
+    }
+
+    private static func formatCurrentProgress(_ value: Double) -> String {
+        String(format: "%.2f", value * 100.0)
     }
 }

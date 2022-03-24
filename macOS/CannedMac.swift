@@ -29,6 +29,9 @@ class CannedMac: ObservableObject {
     @Published
     var currentVmState: VZVirtualMachine.State = .stopped
 
+    @Published
+    var isResetRequested: Bool = false
+
     var downloadProgressObserver: NSKeyValueObservation?
     var installProgressObserver: NSKeyValueObservation?
     var currentStateObserver: NSKeyValueObservation?
@@ -149,6 +152,7 @@ class CannedMac: ObservableObject {
         }
 
         try doApplicationSupportDelete()
+        isResetRequested = false
         try await bootVirtualMachine(memory: memory)
     }
 

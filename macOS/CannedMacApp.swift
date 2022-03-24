@@ -17,6 +17,13 @@ struct CannedMacApp: App {
             CannedMacView(can: can)
         }
         .windowToolbarStyle(.unifiedCompact)
+        .commands {
+            CommandGroup(after: .appSettings) {
+                Button("Reset Virtual Machine") {
+                    can.isResetRequested = true
+                }
+            }
+        }
 
         Settings {
             CannedMacSettings()

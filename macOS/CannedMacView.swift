@@ -15,78 +15,80 @@ struct CannedMacView: View {
     @State
     var isResetVirtualMachineDialogOpen = false
 
+    @State
+    var isDownloadRestoreImageShown = false
+
+    @State
+    var isInstallerShown = false
+
+    @State
+    var isErrorShown = false
+
     @AppStorage("virtualMachineMemory")
     private var virtualMachineMemoryGigabytes = 4.0
 
     @AppStorage("virtualMachineAutoBoot")
     private var virtualMachineAutoBoot = true
 
-    var inhibit: Bool = false
+    var inhibitAutoBoot: Bool = false
 
     var body: some View {
-        VStack {
-            switch can.state {
-            case .downloadInstaller:
-                DownloadInstallerView(can: can)
-                    .padding()
-            case .installingMacOS:
-                InstallerView(can: can)
-                    .padding()
-            case .error:
-                Text(can.error?.localizedDescription ?? "Unknown")
-                    .padding()
-            default:
-                VirtualMachineView(can.vm, capturesSystemKeys: true)
+        VirtualMachineView(can.vm, capturesSystemKeys: true)
+            .task {
+                if !inhibitAutoBoot, virtualMachineAutoBoot, can.currentVmState == .stopped, can.state == .unknown {
+                    await bootVirtualMachine()
+                }
             }
-        }
-        .task {
-            if !inhibit, virtualMachineAutoBoot, can.currentVmState == .stopped {
-                await bootVirtualMachine()
-            }
-        }
-        .toolbar {
-            ToolbarItem {
-                if can.currentVmState == .stopped {
-                    Button("􀊄") {
-                        if let vm = can.vm {
-                            vm.start { _ in }
-                        } else {
+            .toolbar {
+                ToolbarItem {
+                    if can.currentVmState == .stopped {
+                        Button("􀊄") {
                             Task {
                                 await bootVirtualMachine()
                             }
                         }
-                    }
-                } else {
-                    Button("􀛷") {
-                        can.vm?.stop { _ in }
+                    } else {
+                        Button("􀛷") {
+                            can.vm?.stop { _ in }
+                        }
                     }
                 }
             }
-
-            ToolbarItem {
-                Button("􀈒") {
+            .sheet(isPresented: $isDownloadRestoreImageShown) {
+                DownloadInstallerView(can: can)
+                    .frame(minWidth: 300, minHeight: 100)
+                    .padding(.horizontal, 100)
+                    .padding(.vertical)
+            }
+            .sheet(isPresented: $isInstallerShown) {
+                InstallerView(can: can)
+                    .frame(minWidth: 300, minHeight: 100)
+                    .padding(.horizontal, 100)
+                    .padding(.vertical)
+            }
+            .onChange(of: can.state) { state in
+                isDownloadRestoreImageShown = state == .downloadInstaller
+                isInstallerShown = state == .installingMacOS
+                isErrorShown = state == .error
+            }
+            .onChange(of: can.isResetRequested) { value in
+                if value {
                     isResetVirtualMachineDialogOpen = true
                 }
             }
-        }
-        .confirmationDialog("Reset Virtual Machine", isPresented: $isResetVirtualMachineDialogOpen) {
-            Button("Reset", role: .destructive) {
-                Task {
-                    try await can.deleteVirtualMachine(memory: Int(virtualMachineMemoryGigabytes))
-                }
+            .alert("macOS Virtual Machine Error", isPresented: $isErrorShown) {
+                Text(can.error?.localizedDescription ?? "Unknown Error")
+                    .padding()
             }
-
-            Button("Keep", role: .cancel) {}.keyboardShortcut(.defaultAction)
-        }
-        .frame(
-            minWidth: 800,
-            idealWidth: 1920,
-            maxWidth: nil,
-            minHeight: 500,
-            idealHeight: 1080,
-            maxHeight: nil,
-            alignment: .center
-        )
+            .frame(
+                minWidth: 800,
+                idealWidth: 1920,
+                maxWidth: nil,
+                minHeight: 500,
+                idealHeight: 1080,
+                maxHeight: nil,
+                alignment: .center
+            )
     }
 
     func bootVirtualMachine() async {
@@ -104,7 +106,7 @@ struct CannedMacView_Previews: PreviewProvider {
     static var previews: some View {
         CannedMacView(
             can: CannedMac(),
-            inhibit: true
+            inhibitAutoBoot: true
         )
     }
 }

@@ -32,7 +32,8 @@ struct CannedMacView: View {
                 Text("macOS in a can")
                     .padding()
             }
-        }.task {
+        }
+        .task {
             if !inhibit {
                 do {
                     try await can.bootVirtualMachine()
@@ -40,6 +41,9 @@ struct CannedMacView: View {
                     can.setCurrentError(error)
                 }
             }
+        }
+        .onDisappear {
+            can.vm?.stop { _ in }
         }
         .toolbar {
             ToolbarItem {
@@ -49,11 +53,7 @@ struct CannedMacView: View {
                     }
                 } else {
                     Button("􀛷") {
-                        do {
-                            try can.vm?.requestStop()
-                        } catch {
-                            can.setCurrentError(error)
-                        }
+                        can.vm?.stop { _ in }
                     }
                 }
             }

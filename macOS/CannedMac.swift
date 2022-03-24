@@ -26,8 +26,12 @@ class CannedMac: ObservableObject {
     @Published
     var vm: VZVirtualMachine?
 
+    @Published
+    var currentVmState: VZVirtualMachine.State = .stopped
+
     var downloadProgressObserver: NSKeyValueObservation?
     var installProgressObserver: NSKeyValueObservation?
+    var currentStateObserver: NSKeyValueObservation?
 
     func createVmConfiguration() async throws -> (VZVirtualMachineConfiguration, VZMacOSRestoreImage?) {
         let existingHardwareModel = try loadMacHardwareModel()
@@ -126,6 +130,13 @@ class CannedMac: ObservableObject {
             self.state = .bootVirtualMachine
             self.vm = vm
         }
+
+        currentStateObserver = vm.observe(\.state, options: [.initial, .new]) { machine, _ in
+            DispatchQueue.main.async {
+                self.currentVmState = machine.state
+            }
+        }
+
         try await vm.start()
     }
 

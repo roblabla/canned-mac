@@ -13,5 +13,9 @@ struct CannedMacApp: App {
         WindowGroup {
             CannedMacView()
         }
+        .windowToolbarStyle(.unifiedCompact)
+        .commands {
+            CommandGroup(replacing: .newItem) {}
+        }
     }
 }

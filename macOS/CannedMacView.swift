@@ -6,42 +6,74 @@
 //
 
 import SwiftUI
+import Virtualization
 
 struct CannedMacView: View {
     @ObservedObject
     var can = CannedMac()
 
+    var inhibit: Bool = false
+
     var body: some View {
         VStack {
             switch can.state {
+            case .downloadInstaller:
+                DownloadInstallerView(can: can)
+                    .padding()
             case .installingMacOS:
                 InstallerView(can: can)
                     .padding()
             case .bootVirtualMachine:
-                VirtualMachineView(can.vm)
-            case .downloadInstaller:
-                DownloadInstallerView(can: can)
-                    .padding()
+                VirtualMachineView(can.vm, capturesSystemKeys: true)
             case .error:
                 Text("ERROR: \(can.error?.localizedDescription ?? "Unknown")")
                     .padding()
             default:
-                Text("Unknown State")
+                Text("macOS in a can")
                     .padding()
             }
         }.task {
-            do {
-                try await can.bootVirtualMachine()
-            } catch {
-                can.setCurrentError(error)
+            if !inhibit {
+                do {
+                    try await can.bootVirtualMachine()
+                } catch {
+                    can.setCurrentError(error)
+                }
             }
         }
-        .frame(minWidth: 800, idealWidth: 1920, maxWidth: nil, minHeight: 450, idealHeight: 1080, maxHeight: nil, alignment: .center)
+        .toolbar {
+            ToolbarItem {
+                if can.currentVmState == .stopped {
+                    Button("􀊄") {
+                        can.vm?.start { _ in }
+                    }
+                } else {
+                    Button("􀛷") {
+                        do {
+                            try can.vm?.requestStop()
+                        } catch {
+                            can.setCurrentError(error)
+                        }
+                    }
+                }
+            }
+        }
+        .frame(
+            minWidth: 800,
+            idealWidth: 1920,
+            maxWidth: nil,
+            minHeight: 450,
+            idealHeight: 1080,
+            maxHeight: nil,
+            alignment: .center
+        )
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        CannedMacView()
+        CannedMacView(
+            inhibit: true
+        )
     }
 }

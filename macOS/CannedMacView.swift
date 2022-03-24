@@ -40,7 +40,7 @@ struct CannedMacView: View {
             }
         }
         .task {
-            if !inhibit, virtualMachineAutoBoot {
+            if !inhibit, virtualMachineAutoBoot, can.currentVmState == .stopped {
                 await bootVirtualMachine()
             }
         }

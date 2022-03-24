@@ -10,7 +10,7 @@ import SwiftUI
 @main
 struct CannedMacApp: App {
     @ObservedObject
-    var can = CannedMac()
+    var can = GlobalVirtualMachine.can
 
     var body: some Scene {
         WindowGroup {

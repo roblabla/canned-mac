@@ -18,6 +18,7 @@
 		2AAE43D927EABEFD005A8EE0 /* InstallerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AAE43D827EABEFD005A8EE0 /* InstallerView.swift */; };
 		2AAE43DB27EADF5B005A8EE0 /* VirtualMachineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AAE43DA27EADF5B005A8EE0 /* VirtualMachineView.swift */; };
 		2AD7150E27EC316D00EDD14E /* CannedMacSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AD7150D27EC316D00EDD14E /* CannedMacSettings.swift */; };
+		2AD7151027EC4DDD00EDD14E /* GlobalVirtualMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AD7150F27EC4DDD00EDD14E /* GlobalVirtualMachine.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 		2AAE43D827EABEFD005A8EE0 /* InstallerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallerView.swift; sourceTree = "<group>"; };
 		2AAE43DA27EADF5B005A8EE0 /* VirtualMachineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirtualMachineView.swift; sourceTree = "<group>"; };
 		2AD7150D27EC316D00EDD14E /* CannedMacSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CannedMacSettings.swift; sourceTree = "<group>"; };
+		2AD7150F27EC4DDD00EDD14E /* GlobalVirtualMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalVirtualMachine.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,6 +80,7 @@
 				2AAE43DA27EADF5B005A8EE0 /* VirtualMachineView.swift */,
 				2AAE43C327EA9CFC005A8EE0 /* Assets.xcassets */,
 				2AAE43C527EA9CFC005A8EE0 /* Preview Content */,
+				2AD7150F27EC4DDD00EDD14E /* GlobalVirtualMachine.swift */,
 			);
 			path = macOS;
 			sourceTree = "<group>";
@@ -162,6 +165,7 @@
 			files = (
 				2AAE43D127EAA42C005A8EE0 /* CannedMac.swift in Sources */,
 				2AAE43CF27EA9D35005A8EE0 /* DownloadInstallerView.swift in Sources */,
+				2AD7151027EC4DDD00EDD14E /* GlobalVirtualMachine.swift in Sources */,
 				2AAE43C227EA9CFB005A8EE0 /* CannedMacView.swift in Sources */,
 				2AAE43D327EAA779005A8EE0 /* FileUtilities.swift in Sources */,
 				2AAE43DB27EADF5B005A8EE0 /* VirtualMachineView.swift in Sources */,

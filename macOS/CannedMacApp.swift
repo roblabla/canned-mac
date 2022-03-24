@@ -17,5 +17,9 @@ struct CannedMacApp: App {
         .commands {
             CommandGroup(replacing: .newItem) {}
         }
+
+        Settings {
+            CannedMacSettings()
+        }
     }
 }

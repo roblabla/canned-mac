@@ -17,6 +17,7 @@
 		2AAE43D527EAA947005A8EE0 /* UserError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AAE43D427EAA947005A8EE0 /* UserError.swift */; };
 		2AAE43D927EABEFD005A8EE0 /* InstallerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AAE43D827EABEFD005A8EE0 /* InstallerView.swift */; };
 		2AAE43DB27EADF5B005A8EE0 /* VirtualMachineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AAE43DA27EADF5B005A8EE0 /* VirtualMachineView.swift */; };
+		2AD7150E27EC316D00EDD14E /* CannedMacSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AD7150D27EC316D00EDD14E /* CannedMacSettings.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		2AAE43D427EAA947005A8EE0 /* UserError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserError.swift; sourceTree = "<group>"; };
 		2AAE43D827EABEFD005A8EE0 /* InstallerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallerView.swift; sourceTree = "<group>"; };
 		2AAE43DA27EADF5B005A8EE0 /* VirtualMachineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirtualMachineView.swift; sourceTree = "<group>"; };
+		2AD7150D27EC316D00EDD14E /* CannedMacSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CannedMacSettings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +69,7 @@
 				2AAE43C827EA9CFC005A8EE0 /* macOS.entitlements */,
 				2AAE43D027EAA42C005A8EE0 /* CannedMac.swift */,
 				2AAE43BF27EA9CFB005A8EE0 /* CannedMacApp.swift */,
+				2AD7150D27EC316D00EDD14E /* CannedMacSettings.swift */,
 				2AAE43C127EA9CFB005A8EE0 /* CannedMacView.swift */,
 				2AAE43CE27EA9D35005A8EE0 /* DownloadInstallerView.swift */,
 				2AAE43D227EAA779005A8EE0 /* FileUtilities.swift */,
@@ -163,6 +166,7 @@
 				2AAE43D327EAA779005A8EE0 /* FileUtilities.swift in Sources */,
 				2AAE43DB27EADF5B005A8EE0 /* VirtualMachineView.swift in Sources */,
 				2AAE43C027EA9CFB005A8EE0 /* CannedMacApp.swift in Sources */,
+				2AD7150E27EC316D00EDD14E /* CannedMacSettings.swift in Sources */,
 				2AAE43D527EAA947005A8EE0 /* UserError.swift in Sources */,
 				2AAE43D927EABEFD005A8EE0 /* InstallerView.swift in Sources */,
 			);

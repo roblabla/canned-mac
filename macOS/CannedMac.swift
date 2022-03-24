@@ -33,7 +33,7 @@ class CannedMac: ObservableObject {
     var installProgressObserver: NSKeyValueObservation?
     var currentStateObserver: NSKeyValueObservation?
 
-    func createVmConfiguration() async throws -> (VZVirtualMachineConfiguration, VZMacOSRestoreImage?) {
+    func createVmConfiguration(memory: Int) async throws -> (VZVirtualMachineConfiguration, VZMacOSRestoreImage?) {
         let existingHardwareModel = try loadMacHardwareModel()
 
         let model: VZMacHardwareModel
@@ -56,7 +56,7 @@ class CannedMac: ObservableObject {
 
         let configuration = VZVirtualMachineConfiguration()
         configuration.cpuCount = computeCpuCount()
-        configuration.memorySize = computeMemorySize()
+        configuration.memorySize = computeMemorySize(memory)
 
         let platform = VZMacPlatformConfiguration()
         platform.machineIdentifier = try loadOrCreateMachineIdentifier()
@@ -104,8 +104,8 @@ class CannedMac: ObservableObject {
     }
 
     @MainActor
-    func bootVirtualMachine() async throws {
-        let (configuration, macRestoreImage) = try await createVmConfiguration()
+    func bootVirtualMachine(memory: Int) async throws {
+        let (configuration, macRestoreImage) = try await createVmConfiguration(memory: memory)
         let vm = VZVirtualMachine(configuration: configuration, queue: DispatchQueue.main)
 
         if let macRestoreImage = macRestoreImage {
@@ -138,6 +138,18 @@ class CannedMac: ObservableObject {
         }
 
         try await vm.start()
+    }
+
+    @MainActor
+    func deleteVirtualMachine(memory: Int) async throws {
+        if let vm = vm {
+            if vm.state != .stopped {
+                try await vm.stop()
+            }
+        }
+
+        try doApplicationSupportDelete()
+        try await bootVirtualMachine(memory: memory)
     }
 
     func loadMacHardwareModel() throws -> VZMacHardwareModel? {
@@ -241,8 +253,8 @@ class CannedMac: ObservableObject {
         }
     }
 
-    func computeMemorySize() -> UInt64 {
-        var memorySize = (4 * 1024 * 1024 * 1024) as UInt64
+    func computeMemorySize(_ memory: Int) -> UInt64 {
+        var memorySize = (UInt64(memory) * 1024 * 1024 * 1024) as UInt64
         memorySize = max(memorySize, VZVirtualMachineConfiguration.minimumAllowedMemorySize)
         memorySize = min(memorySize, VZVirtualMachineConfiguration.maximumAllowedMemorySize)
 
@@ -257,6 +269,12 @@ class CannedMac: ObservableObject {
         virtualCPUCount = min(virtualCPUCount, VZVirtualMachineConfiguration.maximumAllowedCPUCount)
 
         return virtualCPUCount
+    }
+
+    func doApplicationSupportDelete() throws {
+        let applicationSupportDirectoryUrl = try FileUtilities.getApplicationSupportDirectory()
+        try FileManager.default.trashItem(at: applicationSupportDirectoryUrl, resultingItemURL: nil)
+        _ = try FileUtilities.getApplicationSupportDirectory()
     }
 
     func setCurrentError(_ error: Error) {

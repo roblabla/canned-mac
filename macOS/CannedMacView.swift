@@ -12,6 +12,15 @@ struct CannedMacView: View {
     @ObservedObject
     var can = CannedMac()
 
+    @State
+    var isResetVirtualMachineDialogOpen = false
+
+    @AppStorage("virtualMachineMemory")
+    private var virtualMachineMemoryGigabytes = 4.0
+
+    @AppStorage("virtualMachineAutoBoot")
+    private var virtualMachineAutoBoot = true
+
     var inhibit: Bool = false
 
     var body: some View {
@@ -23,23 +32,16 @@ struct CannedMacView: View {
             case .installingMacOS:
                 InstallerView(can: can)
                     .padding()
-            case .bootVirtualMachine:
-                VirtualMachineView(can.vm, capturesSystemKeys: true)
             case .error:
-                Text("ERROR: \(can.error?.localizedDescription ?? "Unknown")")
+                Text(can.error?.localizedDescription ?? "Unknown")
                     .padding()
             default:
-                Text("macOS in a can")
-                    .padding()
+                VirtualMachineView(can.vm, capturesSystemKeys: true)
             }
         }
         .task {
-            if !inhibit {
-                do {
-                    try await can.bootVirtualMachine()
-                } catch {
-                    can.setCurrentError(error)
-                }
+            if !inhibit, virtualMachineAutoBoot {
+                await bootVirtualMachine()
             }
         }
         .onDisappear {
@@ -49,7 +51,13 @@ struct CannedMacView: View {
             ToolbarItem {
                 if can.currentVmState == .stopped {
                     Button("􀊄") {
-                        can.vm?.start { _ in }
+                        if let vm = can.vm {
+                            vm.start { _ in }
+                        } else {
+                            Task {
+                                await bootVirtualMachine()
+                            }
+                        }
                     }
                 } else {
                     Button("􀛷") {
@@ -57,16 +65,41 @@ struct CannedMacView: View {
                     }
                 }
             }
+
+            ToolbarItem {
+                Button("􀈒") {
+                    isResetVirtualMachineDialogOpen = true
+                }
+            }
+        }
+        .confirmationDialog("Reset Virtual Machine", isPresented: $isResetVirtualMachineDialogOpen) {
+            Button("Reset", role: .destructive) {
+                Task {
+                    try await can.deleteVirtualMachine(memory: Int(virtualMachineMemoryGigabytes))
+                }
+            }
+
+            Button("Keep", role: .cancel) {}.keyboardShortcut(.defaultAction)
         }
         .frame(
             minWidth: 800,
             idealWidth: 1920,
             maxWidth: nil,
-            minHeight: 450,
+            minHeight: 500,
             idealHeight: 1080,
             maxHeight: nil,
             alignment: .center
         )
+    }
+
+    func bootVirtualMachine() async {
+        do {
+            try await can.bootVirtualMachine(
+                memory: Int(virtualMachineMemoryGigabytes)
+            )
+        } catch {
+            can.setCurrentError(error)
+        }
     }
 }
 

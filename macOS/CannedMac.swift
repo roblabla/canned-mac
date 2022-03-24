@@ -81,6 +81,7 @@ class CannedMac: ObservableObject {
         configuration.storageDevices.append(storage)
 
         let network = VZVirtioNetworkDeviceConfiguration()
+        network.macAddress = try loadOrCreateMacAddress(network.macAddress)
         network.attachment = VZNATNetworkDeviceAttachment()
         configuration.networkDevices.append(network)
 
@@ -101,6 +102,10 @@ class CannedMac: ObservableObject {
         )
         gpu.displays.append(display)
         configuration.graphicsDevices.append(gpu)
+
+        #if CANNED_MAC_USE_PRIVATE_APIS
+            configuration.addGdbDebugStub(port: 1)
+        #endif
 
         try configuration.validate()
         return (configuration, macRestoreImage)
@@ -140,7 +145,12 @@ class CannedMac: ObservableObject {
             }
         }
 
-        try await vm.start()
+        #if CANNED_MAC_USE_PRIVATE_APIS
+            let options = VZEVirtualMachineStartOptions()
+            try await vm.extendedStart(with: options)
+        #else
+            try await vm.start()
+        #endif
     }
 
     @MainActor
@@ -238,6 +248,22 @@ class CannedMac: ObservableObject {
             let data = identifier.dataRepresentation
             try data.write(to: macIdentifierUrl)
             return identifier
+        }
+    }
+
+    func loadOrCreateMacAddress(_ randomAddress: VZMACAddress) throws -> VZMACAddress {
+        let applicationSupportDirectoryUrl = try FileUtilities.getApplicationSupportDirectory()
+        let macAddressUrl = applicationSupportDirectoryUrl.appendingPathComponent("macaddress.bin")
+
+        if FileManager.default.fileExists(atPath: macAddressUrl.path) {
+            let data = try Data(contentsOf: macAddressUrl)
+            let string = String(data: data, encoding: .utf8)!
+            return VZMACAddress(string: string)!
+        } else {
+            let string = randomAddress.string
+            let data = string.data(using: .utf8)!
+            try data.write(to: macAddressUrl)
+            return randomAddress
         }
     }
 

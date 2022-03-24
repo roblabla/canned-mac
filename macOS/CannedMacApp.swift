@@ -9,14 +9,14 @@ import SwiftUI
 
 @main
 struct CannedMacApp: App {
+    @ObservedObject
+    var can = CannedMac()
+
     var body: some Scene {
         WindowGroup {
-            CannedMacView()
+            CannedMacView(can: can)
         }
         .windowToolbarStyle(.unifiedCompact)
-        .commands {
-            CommandGroup(replacing: .newItem) {}
-        }
 
         Settings {
             CannedMacSettings()

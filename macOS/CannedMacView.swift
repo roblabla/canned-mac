@@ -10,7 +10,7 @@ import Virtualization
 
 struct CannedMacView: View {
     @ObservedObject
-    var can = CannedMac()
+    var can: CannedMac
 
     @State
     var isResetVirtualMachineDialogOpen = false
@@ -43,9 +43,6 @@ struct CannedMacView: View {
             if !inhibit, virtualMachineAutoBoot {
                 await bootVirtualMachine()
             }
-        }
-        .onDisappear {
-            can.vm?.stop { _ in }
         }
         .toolbar {
             ToolbarItem {
@@ -103,9 +100,10 @@ struct CannedMacView: View {
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
+struct CannedMacView_Previews: PreviewProvider {
     static var previews: some View {
         CannedMacView(
+            can: CannedMac(),
             inhibit: true
         )
     }

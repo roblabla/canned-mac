@@ -100,7 +100,7 @@ struct CannedMacView: View {
                 minWidth: 800,
                 idealWidth: 1920,
                 maxWidth: nil,
-                minHeight: 500,
+                minHeight: 510,
                 idealHeight: 1080,
                 maxHeight: nil,
                 alignment: .center

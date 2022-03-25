@@ -89,10 +89,28 @@ class CannedMac: ObservableObject {
         network.attachment = VZNATNetworkDeviceAttachment()
         configuration.networkDevices.append(network)
 
-        let keyboard = VZUSBKeyboardConfiguration()
+        let keyboard: VZKeyboardConfiguration
+        #if CANNED_MAC_USE_PRIVATE_APIS
+        if options.macInputMode {
+            keyboard = VZPrivateUtilities.createMacKeyboardConfiguration()
+        } else {
+            keyboard = VZUSBKeyboardConfiguration()
+        }
+        #else
+        keyboard = VZUSBKeyboardConfiguration()
+        #endif
         configuration.keyboards.append(keyboard)
 
-        let pointingDevice = VZUSBScreenCoordinatePointingDeviceConfiguration()
+        let pointingDevice: VZPointingDeviceConfiguration
+        #if CANNED_MAC_USE_PRIVATE_APIS
+        if options.macInputMode {
+            pointingDevice = VZPrivateUtilities.createMacTrackpadConfiguration()
+        } else {
+            pointingDevice = VZUSBScreenCoordinatePointingDeviceConfiguration()
+        }
+        #else
+        pointingDevice = VZUSBScreenCoordinatePointingDeviceConfiguration()
+        #endif
         configuration.pointingDevices.append(pointingDevice)
 
         let memoryBalloon = VZVirtioTraditionalMemoryBalloonDeviceConfiguration()
@@ -172,7 +190,7 @@ class CannedMac: ObservableObject {
             vmVncServer = nil
         }
 
-        let startOptions = VZEVirtualMachineStartOptions()
+        let startOptions = VZExtendedVirtualMachineStartOptions()
         startOptions.bootMacOSRecovery = options.bootToRecovery
         try await vm.extendedStart(with: startOptions)
         #else

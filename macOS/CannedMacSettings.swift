@@ -34,6 +34,9 @@ struct CannedMacSettings: View {
 
     @AppStorage("virtualMachineVncServerPassword")
     var virtualMachineVncServerPassword = "hunter2"
+
+    @AppStorage("virtualMachineEnableMacInput")
+    var virtualMachineEnableMacInput = false
     #endif
 
     @AppStorage("virtualMachineDisplayResolution")
@@ -50,6 +53,8 @@ struct CannedMacSettings: View {
             if virtualMachineEnableVncServer {
                 Toggle("VNC Server Authentication", isOn: $virtualMachineEnableVncServerAuthentication)
             }
+
+            Toggle("Mac Input", isOn: $virtualMachineEnableMacInput)
             #endif
 
             Slider(value: $virtualMachineMemoryGigabytes, in: toGigabytes(VZVirtualMachineConfiguration.minimumAllowedMemorySize) ... toGigabytes(VZVirtualMachineConfiguration.maximumAllowedMemorySize)) {

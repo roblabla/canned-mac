@@ -14,6 +14,7 @@ struct VirtualMachineOptions: Codable {
     #if CANNED_MAC_USE_PRIVATE_APIS
     var bootToRecovery: Bool = false
     var gdbDebugStub: Bool = false
+    var macInputMode: Bool = false
     var vncServerEnabled: Bool = false
     var vncServerPort: Int = 5905
     var vncServerAuthenticationEnabled: Bool = false
@@ -39,6 +40,8 @@ struct VirtualMachineOptions: Codable {
 
         options.vncServerAuthenticationEnabled = defaults.bool(forKey: "virtualMachineEnableVncServerAuthentication")
         options.vncServerPassword = defaults.string(forKey: "virtualMachineVncServerPassword") ?? "hunter2"
+
+        options.macInputMode = defaults.bool(forKey: "virtualMachineEnableMacInput")
         #endif
         return options
     }

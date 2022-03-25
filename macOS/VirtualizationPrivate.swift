@@ -13,6 +13,14 @@ import Virtualization
     init()
 }
 
+@objc protocol _VZMacKeyboardConfiguration {
+    init()
+}
+
+@objc protocol _VZMacTrackpadConfiguration {
+    init()
+}
+
 @objc protocol _VZEFIBootLoader {
     init()
 
@@ -65,7 +73,7 @@ import Virtualization
     var forceDFU: Bool { get set }
 }
 
-class VZEVirtualMachineStartOptions {
+class VZExtendedVirtualMachineStartOptions {
     var panicAction: Bool?
     var stopInIBootStage1: Bool?
     var stopInIBootStage2: Bool?
@@ -105,7 +113,7 @@ extension VZVirtualMachineConfiguration {
 }
 
 extension VZVirtualMachine {
-    func extendedStart(with options: VZEVirtualMachineStartOptions) async throws {
+    func extendedStart(with options: VZExtendedVirtualMachineStartOptions) async throws {
         try await unsafeBitCast(self, to: _VZVirtualMachine.self)._start(with: options.toActualOptions())
     }
 }
@@ -129,6 +137,16 @@ enum VZPrivateUtilities {
 
     static func createGdbDebugStub(_ port: Int) -> _VZGDBDebugStubConfiguration {
         unsafeBitCast(NSClassFromString("_VZGDBDebugStubConfiguration")!, to: _VZGDBDebugStubConfiguration.Type.self).init(port: port)
+    }
+
+    static func createMacKeyboardConfiguration() -> VZKeyboardConfiguration {
+        let macKeyboard = unsafeBitCast(NSClassFromString("_VZMacKeyboardConfiguration")!, to: _VZMacKeyboardConfiguration.Type.self).init()
+        return unsafeBitCast(macKeyboard, to: VZKeyboardConfiguration.self)
+    }
+
+    static func createMacTrackpadConfiguration() -> VZPointingDeviceConfiguration {
+        let macTrackpad = unsafeBitCast(NSClassFromString("_VZMacTrackpadConfiguration")!, to: _VZMacTrackpadConfiguration.Type.self).init()
+        return unsafeBitCast(macTrackpad, to: VZPointingDeviceConfiguration.self)
     }
 }
 #endif

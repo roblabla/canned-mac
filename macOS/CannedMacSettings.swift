@@ -45,6 +45,9 @@ struct CannedMacSettings: View {
     @AppStorage("virtualMachineDisplayResolution")
     var virtualMachineDisplayResolution: DisplayResolution = .r1920_1080
 
+    @AppStorage("virtualMachineSerialPortOutputType")
+    var virtualMachineSerialPortOutputType: SerialPortType = .virtio
+
     var body: some View {
         Form {
             Section(header: Text("General")) {
@@ -86,6 +89,14 @@ struct CannedMacSettings: View {
 
             Section(header: Text("Advanced")) {
                 Toggle("Serial Port Output", isOn: $virtualMachineEnableSerialPortOutput)
+
+                if virtualMachineEnableSerialPortOutput {
+                    Picker("Serial Port Output Type", selection: $virtualMachineSerialPortOutputType) {
+                        Text("Virtio").tag(SerialPortType.virtio)
+                        Text("PL011").tag(SerialPortType.pl011)
+                        Text("16550").tag(SerialPortType.p16550)
+                    }
+                }
 
                 #if CANNED_MAC_USE_PRIVATE_APIS
                 Toggle("Mac Input", isOn: $virtualMachineEnableMacInput)

@@ -22,6 +22,7 @@ struct VirtualMachineOptions: Codable {
     #endif
 
     var serialPortOutputEnabled: Bool = false
+    var serialPortOutputType: SerialPortType = .virtio
 
     static func loadFromUserDefaults(_ defaults: UserDefaults = UserDefaults.standard) -> VirtualMachineOptions {
         var options = VirtualMachineOptions()
@@ -30,6 +31,9 @@ struct VirtualMachineOptions: Codable {
         let displayResolutionRawValue = defaults.integer(forKey: "virtualMachineDisplayResolution")
         options.displayResolution = DisplayResolution(rawValue: displayResolutionRawValue) ?? .r1920_1080
         options.serialPortOutputEnabled = defaults.bool(forKey: "virtualMachineEnableSerialPortOutput")
+        let serialPortOutputTypeRawValue = defaults.integer(forKey: "virtualMachineSerialPortOutputType")
+        let serialPortOutputType = SerialPortType(rawValue: serialPortOutputTypeRawValue)
+        options.serialPortOutputType = serialPortOutputType
 
         #if CANNED_MAC_USE_PRIVATE_APIS
         options.bootToRecovery = defaults.bool(forKey: "virtualMachineBootRecovery")

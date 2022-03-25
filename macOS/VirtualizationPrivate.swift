@@ -58,6 +58,14 @@ import Virtualization
     func stop()
 }
 
+@objc protocol _VZPL011SerialPortConfiguration {
+    init()
+}
+
+@objc protocol _VZ16550SerialPortConfiguration {
+    init()
+}
+
 @objc protocol _VZVirtualMachine {
     @objc(_startWithOptions:completionHandler:)
     func _start(with options: _VZVirtualMachineStartOptions) async throws
@@ -147,6 +155,16 @@ enum VZPrivateUtilities {
     static func createMacTrackpadConfiguration() -> VZPointingDeviceConfiguration {
         let macTrackpad = unsafeBitCast(NSClassFromString("_VZMacTrackpadConfiguration")!, to: _VZMacTrackpadConfiguration.Type.self).init()
         return unsafeBitCast(macTrackpad, to: VZPointingDeviceConfiguration.self)
+    }
+
+    static func createPL011SerialPortConfiguration() -> VZSerialPortConfiguration {
+        let serialPort = unsafeBitCast(NSClassFromString("_VZPL011SerialPortConfiguration")!, to: _VZPL011SerialPortConfiguration.Type.self).init()
+        return unsafeBitCast(serialPort, to: VZSerialPortConfiguration.self)
+    }
+
+    static func create16550SerialPortConfiguration() -> VZSerialPortConfiguration {
+        let serialPort = unsafeBitCast(NSClassFromString("_VZ16550SerialPortConfiguration")!, to: _VZ16550SerialPortConfiguration.Type.self).init()
+        return unsafeBitCast(serialPort, to: VZSerialPortConfiguration.self)
     }
 }
 #endif

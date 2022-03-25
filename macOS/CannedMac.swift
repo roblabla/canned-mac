@@ -142,7 +142,7 @@ class CannedMac: ObservableObject {
             }
             FileManager.default.createFile(atPath: serialOutputUrl.path, contents: nil)
             let handle = try FileHandle(forWritingTo: serialOutputUrl)
-            let serialPort = VZVirtioConsoleDeviceSerialPortConfiguration()
+            let serialPort = options.serialPortOutputType.createSerialPortConfiguration()
             serialPort.attachment = VZFileHandleSerialPortAttachment(
                 fileHandleForReading: nil, fileHandleForWriting: handle
             )

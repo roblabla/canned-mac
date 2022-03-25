@@ -1,0 +1,45 @@
+//
+//  VirtualMachineOptions.swift
+//  macOS
+//
+//  Created by Kenneth Endfinger on 3/25/22.
+//
+
+import Foundation
+
+struct VirtualMachineOptions: Codable {
+    var memoryInGigabytes: Int = 4
+    var displayResolution: DisplayResolution = .r1920_1080
+
+    #if CANNED_MAC_USE_PRIVATE_APIS
+    var bootToRecovery: Bool = false
+    var gdbDebugStub: Bool = false
+    var vncServerEnabled: Bool = false
+    var vncServerPort: Int = 5905
+    var vncServerAuthenticationEnabled: Bool = false
+    var vncServerPassword: String = "hunter2"
+    #endif
+
+    static func loadFromUserDefaults(_ defaults: UserDefaults = UserDefaults.standard) -> VirtualMachineOptions {
+        var options = VirtualMachineOptions()
+        options.memoryInGigabytes = Int(defaults.double(forKey: "virtualMachineMemory"))
+
+        let displayResolutionRawValue = defaults.integer(forKey: "virtualMachineDisplayResolution")
+        options.displayResolution = DisplayResolution(rawValue: displayResolutionRawValue) ?? .r1920_1080
+
+        #if CANNED_MAC_USE_PRIVATE_APIS
+        options.bootToRecovery = defaults.bool(forKey: "virtualMachineBootRecovery")
+        options.gdbDebugStub = defaults.bool(forKey: "virtualMachineEnableDebugStub")
+        options.vncServerEnabled = defaults.bool(forKey: "virtualMachineEnableVncServer")
+        options.vncServerPort = defaults.integer(forKey: "virtualMachineVncServerPort")
+
+        if options.vncServerPort == 0 {
+            options.vncServerPort = 5905
+        }
+
+        options.vncServerAuthenticationEnabled = defaults.bool(forKey: "virtualMachineEnableVncServerAuthentication")
+        options.vncServerPassword = defaults.string(forKey: "virtualMachineVncServerPassword") ?? "hunter2"
+        #endif
+        return options
+    }
+}

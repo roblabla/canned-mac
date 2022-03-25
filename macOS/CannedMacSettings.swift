@@ -19,23 +19,37 @@ struct CannedMacSettings: View {
     #if CANNED_MAC_USE_PRIVATE_APIS
     @AppStorage("virtualMachineBootRecovery")
     var virtualMachineBootRecovery = false
-    #endif
 
-    @AppStorage("virtualMachineDisplayWidth")
-    var virtualMachineDisplayWidth = 1920
+    @AppStorage("virtualMachineEnableDebugStub")
+    var virtualMachineEnableDebugStub = false
+
+    @AppStorage("virtualMachineEnableVncServer")
+    var virtualMachineEnableVncServer = false
+
+    @AppStorage("virtualMachineEnableVncServerAuthentication")
+    var virtualMachineEnableVncServerAuthentication = false
+
+    @AppStorage("virtualMachineVncServerPort")
+    var virtualMachineVncServerPort = 5905
+
+    @AppStorage("virtualMachineVncServerPassword")
+    var virtualMachineVncServerPassword = "hunter2"
+    #endif
 
     @AppStorage("virtualMachineDisplayResolution")
     var virtualMachineDisplayResolution: DisplayResolution = .r1920_1080
-
-    @AppStorage("virtualMachineDebugStub")
-    var virtualMachineDebugStub = false
 
     var body: some View {
         Form {
             Toggle("Auto-Boot", isOn: $virtualMachineAutoBoot)
             #if CANNED_MAC_USE_PRIVATE_APIS
             Toggle("Recovery Mode", isOn: $virtualMachineBootRecovery)
-            Toggle("Debug Stub", isOn: $virtualMachineDebugStub)
+            Toggle("Debug Stub", isOn: $virtualMachineEnableDebugStub)
+            Toggle("VNC Server", isOn: $virtualMachineEnableVncServer)
+
+            if virtualMachineEnableVncServer {
+                Toggle("VNC Server Authentication", isOn: $virtualMachineEnableVncServerAuthentication)
+            }
             #endif
 
             Slider(value: $virtualMachineMemoryGigabytes, in: toGigabytes(VZVirtualMachineConfiguration.minimumAllowedMemorySize) ... toGigabytes(VZVirtualMachineConfiguration.maximumAllowedMemorySize)) {
@@ -46,6 +60,17 @@ struct CannedMacSettings: View {
                 Text("1920x1080").tag(DisplayResolution.r1920_1080)
                 Text("3840x2160").tag(DisplayResolution.r3840_2160)
             }
+
+            #if CANNED_MAC_USE_PRIVATE_APIS
+            if virtualMachineEnableVncServer {
+                TextField("VNC Server Port", value: $virtualMachineVncServerPort, formatter: portNumberFormatter)
+                    .textFieldStyle(.roundedBorder)
+            }
+
+            if virtualMachineEnableVncServerAuthentication {
+                TextField("VNC Server Password", text: $virtualMachineVncServerPassword)
+            }
+            #endif
         }
         .frame(width: 400)
         .padding()
@@ -53,5 +78,11 @@ struct CannedMacSettings: View {
 
     private func toGigabytes(_ value: UInt64) -> Double {
         Double(value) / 1024.0 / 1024.0 / 1024.0
+    }
+
+    var portNumberFormatter: NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .none
+        return formatter
     }
 }

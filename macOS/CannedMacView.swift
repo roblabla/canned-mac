@@ -24,20 +24,8 @@ struct CannedMacView: View {
     @State
     var isErrorShown = false
 
-    @AppStorage("virtualMachineMemory")
-    private var virtualMachineMemoryGigabytes = 4.0
-
     @AppStorage("virtualMachineAutoBoot")
     private var virtualMachineAutoBoot = true
-
-    @AppStorage("virtualMachineBootRecovery")
-    var virtualMachineBootRecovery = false
-
-    @AppStorage("virtualMachineDisplayResolution")
-    var virtualMachineDisplayResolution: DisplayResolution = .r1920_1080
-
-    @AppStorage("virtualMachineDebugStub")
-    var virtualMachineDebugStub = false
 
     var inhibitAutoBoot: Bool = false
 
@@ -115,12 +103,7 @@ struct CannedMacView: View {
 
     func bootVirtualMachine() async {
         do {
-            try await can.bootVirtualMachine(
-                memory: Int(virtualMachineMemoryGigabytes),
-                resolution: virtualMachineDisplayResolution,
-                enableRecoveryMode: virtualMachineBootRecovery,
-                enableDebugStub: virtualMachineDebugStub
-            )
+            try await can.bootVirtualMachine(VirtualMachineOptions.loadFromUserDefaults())
         } catch {
             can.setCurrentError(error)
         }

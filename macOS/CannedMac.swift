@@ -36,7 +36,11 @@ class CannedMac: ObservableObject {
     var installProgressObserver: NSKeyValueObservation?
     var currentStateObserver: NSKeyValueObservation?
 
-    func createVmConfiguration(memory: Int, resolution: DisplayResolution, enableDebugStub: Bool) async throws -> (VZVirtualMachineConfiguration, VZMacOSRestoreImage?) {
+    #if CANNED_MAC_USE_PRIVATE_APIS
+    var vmVncServer: _VZVNCServer?
+    #endif
+
+    func createVmConfiguration(_ options: VirtualMachineOptions) async throws -> (VZVirtualMachineConfiguration, VZMacOSRestoreImage?) {
         let existingHardwareModel = try loadMacHardwareModel()
 
         let model: VZMacHardwareModel
@@ -59,7 +63,7 @@ class CannedMac: ObservableObject {
 
         let configuration = VZVirtualMachineConfiguration()
         configuration.cpuCount = computeCpuCount()
-        configuration.memorySize = computeMemorySize(memory)
+        configuration.memorySize = computeMemorySize(options.memoryInGigabytes)
 
         let platform = VZMacPlatformConfiguration()
         platform.machineIdentifier = try loadOrCreateMachineIdentifier()
@@ -95,6 +99,8 @@ class CannedMac: ObservableObject {
         configuration.memoryBalloonDevices.append(memoryBalloon)
 
         let gpu = VZMacGraphicsDeviceConfiguration()
+
+        let resolution = options.displayResolution
         let display = VZMacGraphicsDisplayConfiguration(
             widthInPixels: resolution.width,
             heightInPixels: resolution.height,
@@ -104,7 +110,7 @@ class CannedMac: ObservableObject {
         configuration.graphicsDevices.append(gpu)
 
         #if CANNED_MAC_USE_PRIVATE_APIS
-        if enableDebugStub {
+        if options.gdbDebugStub {
             let stub = VZPrivateUtilities.createGdbDebugStub(1)
             configuration.setGdbDebugStub(stub)
         }
@@ -115,8 +121,15 @@ class CannedMac: ObservableObject {
     }
 
     @MainActor
-    func bootVirtualMachine(memory: Int, resolution: DisplayResolution, enableRecoveryMode: Bool, enableDebugStub: Bool) async throws {
-        let (configuration, macRestoreImage) = try await createVmConfiguration(memory: memory, resolution: resolution, enableDebugStub: enableDebugStub)
+    func bootVirtualMachine(_ options: VirtualMachineOptions) async throws {
+        #if CANNED_MAC_USE_PRIVATE_APIS
+        if vmVncServer != nil {
+            vmVncServer!.stop()
+            vmVncServer = nil
+        }
+        #endif
+
+        let (configuration, macRestoreImage) = try await createVmConfiguration(options)
         let vm = VZVirtualMachine(configuration: configuration, queue: DispatchQueue.main)
 
         if let macRestoreImage = macRestoreImage {
@@ -149,9 +162,19 @@ class CannedMac: ObservableObject {
         }
 
         #if CANNED_MAC_USE_PRIVATE_APIS
-        let options = VZEVirtualMachineStartOptions()
-        options.bootMacOSRecovery = enableRecoveryMode
-        try await vm.extendedStart(with: options)
+        if options.vncServerEnabled {
+            let vncServerPassword = options.vncServerAuthenticationEnabled ? options.vncServerPassword : nil
+            let server = VZPrivateUtilities.createVncServer(port: options.vncServerPort, queue: DispatchQueue.main, password: vncServerPassword)
+            server.virtualMachine = vm
+            server.start()
+            vmVncServer = server
+        } else {
+            vmVncServer = nil
+        }
+
+        let startOptions = VZEVirtualMachineStartOptions()
+        startOptions.bootMacOSRecovery = options.bootToRecovery
+        try await vm.extendedStart(with: startOptions)
         #else
         try await vm.start()
         #endif

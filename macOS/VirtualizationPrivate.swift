@@ -32,6 +32,10 @@ import Virtualization
     var _debugStub: _VZGDBDebugStubConfiguration { get @objc(_setDebugStub:) set }
 }
 
+@objc protocol _VZVNCAuthenticationSecurityConfiguration {
+    init(password: String)
+}
+
 @objc protocol _VZVNCNoSecuritySecurityConfiguration {
     init()
 }
@@ -53,6 +57,7 @@ import Virtualization
 
 @objc protocol _VZVirtualMachineStartOptions {
     init()
+
     var panicAction: Bool { get set }
     var stopInIBootStage1: Bool { get set }
     var stopInIBootStage2: Bool { get set }
@@ -106,6 +111,18 @@ extension VZVirtualMachine {
 }
 
 enum VZPrivateUtilities {
+    static func createVncServer(port: Int, queue: DispatchQueue, password: String? = nil) -> _VZVNCServer {
+        unsafeBitCast(NSClassFromString("_VZVNCServer")!, to: _VZVNCServer.Type.self).init(port: port, queue: queue, securityConfiguration: password != nil ? createVncServerAuthentication(password: password!) : createVncServerNoSecurity())
+    }
+
+    static func createVncServerNoSecurity() -> _VZVNCNoSecuritySecurityConfiguration {
+        unsafeBitCast(NSClassFromString("_VZVNCNoSecuritySecurityConfiguration")!, to: _VZVNCNoSecuritySecurityConfiguration.Type.self).init()
+    }
+
+    static func createVncServerAuthentication(password: String) -> _VZVNCAuthenticationSecurityConfiguration {
+        unsafeBitCast(NSClassFromString("_VZVNCAuthenticationSecurityConfiguration")!, to: _VZVNCAuthenticationSecurityConfiguration.Type.self).init(password: password)
+    }
+
     static func createEfiBootLoader() -> _VZEFIBootLoader {
         unsafeBitCast(NSClassFromString("_VZEFIBootLoader")!, to: _VZEFIBootLoader.Type.self).init()
     }

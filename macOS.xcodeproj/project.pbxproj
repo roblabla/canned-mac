@@ -18,8 +18,8 @@
 		2AAE43D927EABEFD005A8EE0 /* InstallerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AAE43D827EABEFD005A8EE0 /* InstallerView.swift */; };
 		2AAE43DB27EADF5B005A8EE0 /* VirtualMachineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AAE43DA27EADF5B005A8EE0 /* VirtualMachineView.swift */; };
 		2AD7150E27EC316D00EDD14E /* CannedMacSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AD7150D27EC316D00EDD14E /* CannedMacSettings.swift */; };
-		2AD7151027EC4DDD00EDD14E /* GlobalVirtualMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AD7150F27EC4DDD00EDD14E /* GlobalVirtualMachine.swift */; };
 		2AD7151227ECFF5B00EDD14E /* VirtualizationPrivate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AD7151127ECFF5B00EDD14E /* VirtualizationPrivate.swift */; };
+		2AD7151827EDA70300EDD14E /* DisplayResolution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AD7151727EDA70300EDD14E /* DisplayResolution.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,8 +36,8 @@
 		2AAE43D827EABEFD005A8EE0 /* InstallerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallerView.swift; sourceTree = "<group>"; };
 		2AAE43DA27EADF5B005A8EE0 /* VirtualMachineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirtualMachineView.swift; sourceTree = "<group>"; };
 		2AD7150D27EC316D00EDD14E /* CannedMacSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CannedMacSettings.swift; sourceTree = "<group>"; };
-		2AD7150F27EC4DDD00EDD14E /* GlobalVirtualMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalVirtualMachine.swift; sourceTree = "<group>"; };
 		2AD7151127ECFF5B00EDD14E /* VirtualizationPrivate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirtualizationPrivate.swift; sourceTree = "<group>"; };
+		2AD7151727EDA70300EDD14E /* DisplayResolution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayResolution.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,9 +75,9 @@
 				2AAE43BF27EA9CFB005A8EE0 /* CannedMacApp.swift */,
 				2AD7150D27EC316D00EDD14E /* CannedMacSettings.swift */,
 				2AAE43C127EA9CFB005A8EE0 /* CannedMacView.swift */,
+				2AD7151727EDA70300EDD14E /* DisplayResolution.swift */,
 				2AAE43CE27EA9D35005A8EE0 /* DownloadInstallerView.swift */,
 				2AAE43D227EAA779005A8EE0 /* FileUtilities.swift */,
-				2AD7150F27EC4DDD00EDD14E /* GlobalVirtualMachine.swift */,
 				2AAE43D827EABEFD005A8EE0 /* InstallerView.swift */,
 				2AAE43D427EAA947005A8EE0 /* UserError.swift */,
 				2AD7151127ECFF5B00EDD14E /* VirtualizationPrivate.swift */,
@@ -168,7 +168,7 @@
 			files = (
 				2AAE43D127EAA42C005A8EE0 /* CannedMac.swift in Sources */,
 				2AAE43CF27EA9D35005A8EE0 /* DownloadInstallerView.swift in Sources */,
-				2AD7151027EC4DDD00EDD14E /* GlobalVirtualMachine.swift in Sources */,
+				2AD7151827EDA70300EDD14E /* DisplayResolution.swift in Sources */,
 				2AAE43C227EA9CFB005A8EE0 /* CannedMacView.swift in Sources */,
 				2AAE43D327EAA779005A8EE0 /* FileUtilities.swift in Sources */,
 				2AAE43DB27EADF5B005A8EE0 /* VirtualMachineView.swift in Sources */,

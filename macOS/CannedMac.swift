@@ -36,7 +36,7 @@ class CannedMac: ObservableObject {
     var installProgressObserver: NSKeyValueObservation?
     var currentStateObserver: NSKeyValueObservation?
 
-    func createVmConfiguration(memory: Int) async throws -> (VZVirtualMachineConfiguration, VZMacOSRestoreImage?) {
+    func createVmConfiguration(memory: Int, resolution: DisplayResolution, enableDebugStub: Bool) async throws -> (VZVirtualMachineConfiguration, VZMacOSRestoreImage?) {
         let existingHardwareModel = try loadMacHardwareModel()
 
         let model: VZMacHardwareModel
@@ -96,15 +96,18 @@ class CannedMac: ObservableObject {
 
         let gpu = VZMacGraphicsDeviceConfiguration()
         let display = VZMacGraphicsDisplayConfiguration(
-            widthInPixels: 1920,
-            heightInPixels: 1080,
-            pixelsPerInch: 80
+            widthInPixels: resolution.width,
+            heightInPixels: resolution.height,
+            pixelsPerInch: resolution.pixelsPerInch
         )
         gpu.displays.append(display)
         configuration.graphicsDevices.append(gpu)
 
         #if CANNED_MAC_USE_PRIVATE_APIS
-            configuration.addGdbDebugStub(port: 1)
+        if enableDebugStub {
+            let stub = VZPrivateUtilities.createGdbDebugStub(1)
+            configuration.setGdbDebugStub(stub)
+        }
         #endif
 
         try configuration.validate()
@@ -112,8 +115,8 @@ class CannedMac: ObservableObject {
     }
 
     @MainActor
-    func bootVirtualMachine(memory: Int) async throws {
-        let (configuration, macRestoreImage) = try await createVmConfiguration(memory: memory)
+    func bootVirtualMachine(memory: Int, resolution: DisplayResolution, enableRecoveryMode: Bool, enableDebugStub: Bool) async throws {
+        let (configuration, macRestoreImage) = try await createVmConfiguration(memory: memory, resolution: resolution, enableDebugStub: enableDebugStub)
         let vm = VZVirtualMachine(configuration: configuration, queue: DispatchQueue.main)
 
         if let macRestoreImage = macRestoreImage {
@@ -146,15 +149,16 @@ class CannedMac: ObservableObject {
         }
 
         #if CANNED_MAC_USE_PRIVATE_APIS
-            let options = VZEVirtualMachineStartOptions()
-            try await vm.extendedStart(with: options)
+        let options = VZEVirtualMachineStartOptions()
+        options.bootMacOSRecovery = enableRecoveryMode
+        try await vm.extendedStart(with: options)
         #else
-            try await vm.start()
+        try await vm.start()
         #endif
     }
 
     @MainActor
-    func deleteVirtualMachine(memory: Int) async throws {
+    func deleteVirtualMachine() async throws {
         if let vm = vm {
             if vm.state != .stopped {
                 try await vm.stop()
@@ -163,7 +167,6 @@ class CannedMac: ObservableObject {
 
         try doApplicationSupportDelete()
         isResetRequested = false
-        try await bootVirtualMachine(memory: memory)
     }
 
     func loadMacHardwareModel() throws -> VZMacHardwareModel? {

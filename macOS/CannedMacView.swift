@@ -30,6 +30,15 @@ struct CannedMacView: View {
     @AppStorage("virtualMachineAutoBoot")
     private var virtualMachineAutoBoot = true
 
+    @AppStorage("virtualMachineBootRecovery")
+    var virtualMachineBootRecovery = false
+
+    @AppStorage("virtualMachineDisplayResolution")
+    var virtualMachineDisplayResolution: DisplayResolution = .r1920_1080
+
+    @AppStorage("virtualMachineDebugStub")
+    var virtualMachineDebugStub = false
+
     var inhibitAutoBoot: Bool = false
 
     var body: some View {
@@ -76,9 +85,22 @@ struct CannedMacView: View {
                     isResetVirtualMachineDialogOpen = true
                 }
             }
-            .alert("macOS Virtual Machine Error", isPresented: $isErrorShown) {
-                Text(can.error?.localizedDescription ?? "Unknown Error")
-                    .padding()
+            .alert(can.error?.localizedDescription ?? "Unknown Error", isPresented: $isErrorShown) {}
+            .confirmationDialog("Reset Virtual Machine", isPresented: $isResetVirtualMachineDialogOpen) {
+                Button("Delete All Data", role: .destructive) {
+                    Task {
+                        do {
+                            try await can.deleteVirtualMachine()
+                            await bootVirtualMachine()
+                        } catch {
+                            can.setCurrentError(error)
+                        }
+                    }
+                }
+
+                Button("Keep", role: .cancel) {
+                    isResetVirtualMachineDialogOpen = false
+                }.keyboardShortcut(.defaultAction)
             }
             .frame(
                 minWidth: 800,
@@ -94,7 +116,10 @@ struct CannedMacView: View {
     func bootVirtualMachine() async {
         do {
             try await can.bootVirtualMachine(
-                memory: Int(virtualMachineMemoryGigabytes)
+                memory: Int(virtualMachineMemoryGigabytes),
+                resolution: virtualMachineDisplayResolution,
+                enableRecoveryMode: virtualMachineBootRecovery,
+                enableDebugStub: virtualMachineDebugStub
             )
         } catch {
             can.setCurrentError(error)

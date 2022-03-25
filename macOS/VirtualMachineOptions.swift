@@ -26,7 +26,12 @@ struct VirtualMachineOptions: Codable {
 
     static func loadFromUserDefaults(_ defaults: UserDefaults = UserDefaults.standard) -> VirtualMachineOptions {
         var options = VirtualMachineOptions()
-        options.memoryInGigabytes = Int(defaults.double(forKey: "virtualMachineMemory"))
+
+        var memoryInGigabytes = defaults.double(forKey: "virtualMachineMemory")
+        if memoryInGigabytes == 0.0 {
+            memoryInGigabytes = 4.0
+        }
+        options.memoryInGigabytes = Int(memoryInGigabytes)
 
         let displayResolutionRawValue = defaults.integer(forKey: "virtualMachineDisplayResolution")
         options.displayResolution = DisplayResolution(rawValue: displayResolutionRawValue) ?? .r1920_1080

@@ -50,6 +50,12 @@ struct CannedMacView: View {
                         }
                     }
                 }
+
+                ToolbarItem {
+                    Button("􀺻") {
+                        NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
+                    }
+                }
             }
             .sheet(isPresented: $isDownloadRestoreImageShown) {
                 DownloadInstallerView(can: can)

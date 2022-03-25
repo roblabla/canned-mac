@@ -21,12 +21,15 @@ struct VirtualMachineOptions: Codable {
     var vncServerPassword: String = "hunter2"
     #endif
 
+    var serialPortOutputEnabled: Bool = false
+
     static func loadFromUserDefaults(_ defaults: UserDefaults = UserDefaults.standard) -> VirtualMachineOptions {
         var options = VirtualMachineOptions()
         options.memoryInGigabytes = Int(defaults.double(forKey: "virtualMachineMemory"))
 
         let displayResolutionRawValue = defaults.integer(forKey: "virtualMachineDisplayResolution")
         options.displayResolution = DisplayResolution(rawValue: displayResolutionRawValue) ?? .r1920_1080
+        options.serialPortOutputEnabled = defaults.bool(forKey: "virtualMachineEnableSerialPortOutput")
 
         #if CANNED_MAC_USE_PRIVATE_APIS
         options.bootToRecovery = defaults.bool(forKey: "virtualMachineBootRecovery")

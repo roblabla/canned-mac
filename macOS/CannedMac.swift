@@ -134,6 +134,21 @@ class CannedMac: ObservableObject {
         }
         #endif
 
+        if options.serialPortOutputEnabled {
+            let applicationSupportDirectoryUrl = try FileUtilities.getApplicationSupportDirectory()
+            let serialOutputUrl = applicationSupportDirectoryUrl.appendingPathComponent("serial0.out")
+            if FileManager.default.fileExists(atPath: serialOutputUrl.path) {
+                try FileManager.default.removeItem(at: serialOutputUrl)
+            }
+            FileManager.default.createFile(atPath: serialOutputUrl.path, contents: nil)
+            let handle = try FileHandle(forWritingTo: serialOutputUrl)
+            let serialPort = VZVirtioConsoleDeviceSerialPortConfiguration()
+            serialPort.attachment = VZFileHandleSerialPortAttachment(
+                fileHandleForReading: nil, fileHandleForWriting: handle
+            )
+            configuration.serialPorts.append(serialPort)
+        }
+
         try configuration.validate()
         return (configuration, macRestoreImage)
     }

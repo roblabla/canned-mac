@@ -127,6 +127,9 @@ class CannedMac: ObservableObject {
         gpu.displays.append(display)
         configuration.graphicsDevices.append(gpu)
 
+        let entropy = VZVirtioEntropyDeviceConfiguration()
+        configuration.entropyDevices.append(entropy)
+
         #if CANNED_MAC_USE_PRIVATE_APIS
         if options.gdbDebugStub {
             let stub = VZPrivateUtilities.createGdbDebugStub(1)

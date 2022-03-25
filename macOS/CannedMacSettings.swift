@@ -93,8 +93,10 @@ struct CannedMacSettings: View {
                 if virtualMachineEnableSerialPortOutput {
                     Picker("Serial Port Output Type", selection: $virtualMachineSerialPortOutputType) {
                         Text("Virtio").tag(SerialPortType.virtio)
+                        #if CANNED_MAC_USE_PRIVATE_APIS
                         Text("PL011").tag(SerialPortType.pl011)
                         Text("16550").tag(SerialPortType.p16550)
+                        #endif
                     }
                 }
 

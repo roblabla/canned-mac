@@ -23,6 +23,8 @@ struct CannedMacApp: App {
                     can.isResetRequested = true
                 }
             }
+
+            CommandGroup(replacing: .newItem) {}
         }
 
         Settings {

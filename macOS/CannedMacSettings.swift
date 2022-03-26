@@ -82,7 +82,7 @@ struct CannedMacSettings: View {
                 }
 
                 if virtualMachineEnableVncServerAuthentication {
-                    TextField("VNC Server Password", text: $virtualMachineVncServerPassword)
+                    SecureField("VNC Server Password", text: $virtualMachineVncServerPassword)
                 }
             }
             #endif

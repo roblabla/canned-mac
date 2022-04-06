@@ -39,20 +39,20 @@ struct CannedMacView: View {
             .toolbar {
                 ToolbarItem {
                     if can.currentVmState == .stopped {
-                        Button("􀊄") {
+                        Button("Power On") {
                             Task {
                                 await bootVirtualMachine()
                             }
                         }
                     } else {
-                        Button("􀛷") {
+                        Button("Power Off") {
                             can.vm?.stop { _ in }
                         }
                     }
                 }
 
                 ToolbarItem {
-                    Button("􀺻") {
+                    Button("Preferences") {
                         NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
                     }
                 }
